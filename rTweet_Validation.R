@@ -1,39 +1,59 @@
 # Libraries ---------------------------------------------------------------
 
-library(tidyverse)
+library(dplyr)
 
 
-# About -------------------------------------------------------------------
 
-# Did I actually capture tweet history stemming back to May 2020?
-# How many "power users" are there, and did they hit the 3,200 RTweet limit?
+# Task --------------------------------------------------------------------
+# Question: Is the rTweet data complete?
 
-# I read in the timelines and get a count.
+# 1. Read in rTweet timeline csv files.
+# 2. Locate missing users, if any exist (deleted/private accounts)
+# 3. Get a list of "power users" (over 3000 tweets)
+# 4. Check for completeness of the data.
 
-# Data Prep ---------------------------------------------------------------
+# 1. Load Data ------------------------------------------------------------
 
-# Read in the timelines
-x <- read_csv("output/timelines1.csv")
-y <- read_csv("output/timelines2.csv")
-z <- read_csv("output/timelines3.csv")
+# Read in the original users file
+users <- read_csv("data/users.csv")
 
-# Combine into a dataframe.
-df <- rbind(x, y, z)
+# Read in the rTweet timelines
+tmls1 <- read_csv("output/timelines1.csv")
+tmls2 <- read_csv("output/timelines2.csv")
+tmls3 <- read_csv("output/timelines3.csv")
 
-# Get Power Users ---------------------------------------------------------
+# Combine the timelines into a single dataframe
+tmls <- rbind(tmls1, tmls2, tmls3)
+
+# 2. Locate Missing Users -------------------------------------------------
+
+# Which accounts did we get info on?
+captured <- tmls %>%
+  distinct(screen_name) %>%
+  pull()
+
+# Reformat the captured usernames to match the `users` file
+captured <- paste("@", captured, sep = "")
+
+# Get list of missing users(deleted and private accounts)
+missing <- setdiff(users, captured)
+
+
+# 3. Get Power Users ------------------------------------------------------
 
 # Get a list of users who tweeted over 3,000 times.
-power_users <- df %>%
+power_users <- tmls %>%
   group_by(screen_name) %>%
   tally() %>%
-  arrange(desc(n)) %>%
-  filter(n > 3000)
+  filter(n > 3000) %>%
+  arrange(desc(n))
 
-# Filter the dataframe by these `hicount` users.
-power_user_tweets <- df %>%
+# Get their tweets.
+power_user_tweets <- tmls %>%
   filter(screen_name %in% power_users$screen_name)
 
-# Check for Completeness --------------------------------------------------
+
+# 4. Check for Completeness -----------------------------------------------
 
 # Reformat the date column, for ease of manipulation.
 power_user_tweets$created_at <- format(power_user_tweets$created_at, "%B")
