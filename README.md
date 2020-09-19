@@ -1,6 +1,13 @@
 # plandemic
 Scripts pertaining to the plandemic subproject
 
+**Scripts:**  
+
+
+1. [rTweet_Collect](https://github.com/mfalling/plandemic/blob/master/rTweet_Collect.R): Collect timelines and show results by month.
+2. [rTweet_Validation](https://github.com/mfalling/plandemic/blob/master/rTweet_Validation.R): Determine if timelines are complete, for our purposes.
+3. [rTweet_Split](https://github.com/mfalling/plandemic/blob/master/rTweet_Split.R): Split the monthly results into seperate sheets in an Excel book, as requested.
+
 **Task:**
 
 
